@@ -1,1 +1,22 @@
+def simple_chatbot():
+    print("Hello! I'm a chatbot. Type 'exit' to end the conversation.")
 
+    while True:
+        user_input = input("You: ").lower()
+
+        if user_input == 'exit':
+            print("Chatbot: Goodbye!")
+            break
+        elif 'hi' in user_input:
+            print("Chatbot: Hello! How can I help you ?")
+        elif 'your name' in user_input:
+            print("Chatbot: I'm a simple chatbot created by ANIKIT DAS.")
+        elif 'how are you' in user_input:
+            print("Chatbot: I'm just a program but I'm here to help you!")
+        elif 'weather' in user_input:
+            print("Chatbot: Sorry, I can't provide weather updates at the moment.")
+        elif 'help' in user_input:
+            print("Chatbot: I'm here to help! You can ask me about my capabilities.")
+        else:
+            print("Chatbot: I'm unable to answer your question.")
+simple_chatbot()
