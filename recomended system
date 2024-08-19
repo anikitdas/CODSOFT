@@ -1,0 +1,51 @@
+import pandas as pd
+import numpy as np
+
+
+data = {
+    'User': ['Anikit', 'Anikit', 'Anikit', 'Dev', 'Dev', 'Dev', 'Carol', 'Carol', 'Carol', 'Rohan', 'Rohan'],
+    'Movie': ['Inception', 'Avengers', 'Titanic', 'Inception', 'Avengers', 'Avatar', 'Avatar', 'Titanic', 'Gladiator', 'Gladiator', 'Avengers'],
+    'Rating': [5, 4, 3, 4, 5, 4, 5, 2, 4, 5, 3]
+}
+
+
+df = pd.DataFrame(data)
+
+
+ratings_matrix = df.pivot(index='User', columns='Movie', values='Rating').fillna(0)
+
+
+def cosine_similarity_manual(matrix):
+    norm = np.linalg.norm(matrix, axis=1)
+    similarity = np.dot(matrix, matrix.T) / (norm[:, None] * norm[None, :])
+    return similarity
+
+
+user_similarity = cosine_similarity_manual(ratings_matrix.values)
+
+
+user_similarity_df = pd.DataFrame(user_similarity, index=ratings_matrix.index, columns=ratings_matrix.index)
+
+def predict_ratings(user, user_similarity_df, ratings_matrix):
+    similar_users = user_similarity_df[user]
+    unrated_movies = ratings_matrix.loc[user][ratings_matrix.loc[user] == 0].index
+    predicted_ratings = {}
+    
+    for movie in unrated_movies:
+        movie_ratings = ratings_matrix[movie]
+        weighted_sum = np.dot(similar_users, movie_ratings)
+        similarity_sum = np.sum(similar_users[movie_ratings > 0])
+        predicted_ratings[movie] = weighted_sum / similarity_sum if similarity_sum != 0 else 0
+    
+    return predicted_ratings
+
+def recommend_movies(predicted_ratings, n=3):
+    return sorted(predicted_ratings, key=predicted_ratings.get, reverse=True)[:n]
+
+
+predicted_ratings = predict_ratings('Anikit', user_similarity_df, ratings_matrix)
+
+
+recommended_movies = recommend_movies(predicted_ratings, n=3)
+
+print("Recommended movies for Anikit:", recommended_movies)
